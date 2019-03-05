@@ -62,6 +62,7 @@ class Graph():
         visited = set()
         # Put the starting vertex in our Queue
         q.enqueue(starting_vertex_id)
+        
         # While the queue is not empty....
         while q.size() > 0:
             # Dequeue the first node from the queue
@@ -82,6 +83,7 @@ class Graph():
         visited = set()
         # Put the starting vertex in our Stack
         s.push(starting_vertex_id)
+        
         # While the stack is not empty....
         while s.size() > 0:
             # Pop the top node from the stack
@@ -96,38 +98,49 @@ class Graph():
                     s.push(neighbor)
 
 
+    def dft_r(self, starting_vertex_id, visited=None):
+        if visited is None:
+            visited=set()
+        # Mark starting node as visited
+        visited.add(starting_vertex_id)
+        # then call dft_r on each unvisited neighbor
+        for neighbor in self.vertices[starting_vertex_id]:
+            if neighbor not in visited:
+                self.dft_r(neighbor, visited)
 
-    def dft_recursion(self, starting_vertex, path=[]):
-        path += [starting_vertex]
 
-        print(path)
 
-        for neighbor in self.vertices[starting_vertex]:
-            if neighbor not in path:
-                path = self.dft_recursion(neighbor, path)
-
-        return path
-
-    def bfs(self, start, end):
-        verts = self.vertices
-        # maintain a queue of paths
-        queue = []
-        # push the first path into the queue
-        queue.append([start])
-        while len(queue) > 0:
-            # get the first path from the queue
-            path = queue.pop(0)
-            # get the last node from the path
-            node = path[-1]
-            # path found
-            if node == end:
-                return print("Path", path)
-            # enumerate all adjacent nodes, construct a new path and push it into the queue
-            for adjacent in verts.get(node, []):
-                new_path = list(path)
-                new_path.append(adjacent)
-                queue.append(new_path)
-        return 'Destination vertex could not be reached from starting point'
+    def bfs(self, starting_vertex_id, target_id):
+        # Create an empty queue
+        q = Queue()
+        # Create an empty set of visited vertices
+        visited = set()
+        # Put the path to the starting vertex in our Queue
+        q.enqueue([starting_vertex_id])
+        
+        # While the queue is not empty....
+        while q.size() > 0:
+            # Dequeue the first path from the queue
+            path = q.dequeue()
+            print("PATH: ", path)
+            # get the current node from the last element in the path
+            v = path[-1]
+            # If that node has not been visted...
+            if v not in visited:
+                # Mark it as visited
+                visited.add(v)
+                # check if it is our target
+                if v == target_id:
+                    #if so, return path to target
+                    return path
+                # Then, put paths to all of it's children into the queue
+                for neighbor in self.vertices[v]:
+                    #copy path into new instance
+                    new_path = list(path)
+                    # appen the neighbor to the end of the path
+                    new_path.append(neighbor)
+                    # enqueue
+                    q.enqueue(neighbor)
 
     def dfs(self, start, end):
         # Create an empty stack
@@ -171,4 +184,4 @@ graph.add_directed_edge('3', '5')
 graph.add_directed_edge('2', '3')
 graph.add_directed_edge('4', '6')
 
-graph.dfs("2", "6")
+graph.bfs("1", "6")
